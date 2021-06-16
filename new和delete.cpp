@@ -8,7 +8,7 @@ struct Person
 };
 int main()
 {
-    Person *p1 = new Person; // 申请一个结构体的内存，并让p1指向它
+    Person *p1 = new Person; // 申请一个结构体的内存，并让p1指向它,cpp中结构体的类型名不需要加上struct
     cin>>p1->name; // 使用该结构体变量
     cin>>p1->age;
     cout<<"name is "<<p1->name<<endl;
