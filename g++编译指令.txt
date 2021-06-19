@@ -1,0 +1,5 @@
+生成可执行文件：g++ test.cpp -o a.out
+生成预编译后的文件：g++ -E test.cpp -o test.i
+生成汇编代码： g++ -S test.i -o test.s
+生成目标文件： g++ -C test.s -o test.o
+生成可执行文件： g++ test.o -o test.out
