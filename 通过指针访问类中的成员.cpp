@@ -75,8 +75,14 @@ int main(int argc, char* argv[]){
     int64_t *pci = vptrc;
     ++pci;// pci指向A中的i
     cout<<(*pci)<<endl;
+    *pci = 11; //将c中的i改为11
     ++pci; //pci指向C中的j
     cout<<(*pci)<<endl;
+    
+    a = c; //对象的赋值，并不会改变vptr的值，即此时a的虚函数表还是class A的虚函数表，但其他成员发生了赋值, i变为了11
+    pa = (int64_t*)&a;
+    cout<<(*pa)<<' '<<(*pa1)<<endl; //*pa没变
+    a.print(); //打印出i=11
     
     return 0;
 }
