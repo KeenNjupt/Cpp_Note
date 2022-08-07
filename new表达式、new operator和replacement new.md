@@ -10,10 +10,11 @@ string *sp = new string("a value") <br>
 是否有重载的operator new函数，有则调用，没有则在全局作用域中查找，再没有就使用标准库函数<br>
 
 # replacement new(定位new)<br>
+类似与allocator类的construct函数<br>
 用来在已经申请的空间中构造对象，operator new分配的内存，程序员无法使用构造函数构造对象<br>
 使用实例：new (place_address) type [size] {initializer list}<br>
 place_address 是一个指向我们申请了的内存的指针<br>
-当delete这些内存时，并不会调用相应的析构函数，因此需要我们显式地调用析构函数
+我们可以显式地调用析构函数销毁对象，但不释放空间。之后利用定位new表达式在该空间中构造对象
 
 代码：
 ```
@@ -63,9 +64,18 @@ public:
         cout<<"in A::delete(), the add is "<<m<<endl;
         free(m);
     }
+    void* operator new(std::size_t, void* __p) noexcept // 定位new调用此版本函数，类内自定义的函数
+    { 
+        cout<<"in A::operator new(size_t, void*)"<<endl;
+        return __p; 
+    }
     int i = 0;
 };
-
+// void* operator new(std::size_t, void* __p) noexcept // 定位new调用此版本函数，该版本已在头文件中定义，无法自定义，但可在类中自定义
+// { 
+//     cout<<"in operator new(size_t, void*)"<<endl;
+//     return __p; 
+// }
 
 
 
@@ -92,6 +102,15 @@ int main(int argc, char* argv[]){
     cout<<p1->i<<endl;
     alloc.destroy(p1);//析构A对象
     alloc.deallocate(p1,1);//释放内存空间
+
+    A *p2 = new A;
+    p2->~A();//显式地销毁对象，但不释放空间
+    ::new(p2)A(20); //定位new表达式，在已申请空间中构造对象,在全局作用域中查找函数operator new(std::size_t, void* __p)
+    //不加::则编译器会在类的作用域中查找，查找名字先于匹配函数；因为A中未定义此同参函数，查找到同名的函数，但参数类型不匹配，编译器报错
+    //可以在A中自定义该函数
+    //加了::, 在全局作用域中查找，最终调用库函数中的void* operator new(std::size_t, void* __p) noexcept版本
+    cout<<p2->i<<endl;
+    delete p2;
 
     return 0;
 }
